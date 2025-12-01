@@ -2,7 +2,7 @@
 % Toerental: 1500 RPM
 % SOA van 4.2º voor TDC
 % Resolutie van 0.2º CA
-% Data voor 69 cycles (maximale van de Smetec, de OGO gensets kunnen in principe “onbeperkt” aan)
+% Data voor 69 cycles (maximale van de Smetec, de OGO gensets kunnen in principe "onbeperkt" aan)
 % 
 %% init
 clear all; clc;close all;
@@ -46,7 +46,7 @@ Ca              = reshape(dataIn(:,1),[],Ncycles); % Both p and Ca are now matri
 p_raw           = reshape(dataIn(:,2),[],Ncycles)*bara; % type 'help reshape' in the command window if you want to know what it does (reshape is a Matlab buit-in command
 
 %% Average the raw data
-p_avg = mean(p_raw, 2); % Calculate the average pressure for each crank angle
+p_avg = AveragePressure(p_raw); % Calculate the average pressure for each crank angle
 
 %% Load sdaq data
 sDaq        = fullfile('Data','20251125_0000001_imep_1.5_injection_18_sdaq.txt');
@@ -54,9 +54,7 @@ IntakeData  = table2array(readtable(sDaq));
 p_intake = mean(IntakeData(:,4))*bara; % average intake pressure in Pa
 
 %% Pegging
-[~, idxIVC] = min(abs(Ca(:,1)-CaIVC));
-p_shift = p_intake - p_avg(idxIVC);
-p_avg_pegged = p_avg + p_shift;
+[p_avg_pegged, p_shift, idxIVC] = PegPressure(Ca, p_avg, p_intake, CaIVC);
 
 %% Plotting 
 f1=figure(1);
@@ -89,3 +87,11 @@ xlim([0.02 0.8]);ylim([0 60]);                      % Matter of taste
 set(gca,'XTick',[0.02 0.05 0.1 0.2 0.5 0.8],...
     'YTick',[0.5 1 2 5 10 20 60],'XGrid','on','YGrid','on');        % I like specific axis labels. Matter of taste
 title({'pV-diagram'})
+
+figure;
+yyaxis left
+plot(Ca, V); ylabel('Volume');
+yyaxis right
+plot(Ca, p_avg); ylabel('Pressure');
+xline(0,'k--','TDC');
+grid on;
