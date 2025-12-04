@@ -1,0 +1,11 @@
+function [dQdTh] = aROHR(p,V, Ca, gamma, iselect)
+pi = p(:, iselect);
+
+Cai = Ca(:, iselect);
+Vi = V(:, iselect);
+
+dpdTh = gradient(pi, Cai);
+dVdTh = gradient(Vi, Cai);
+
+dQdTh = gamma/(gamma-1)*p*dVdTh + 1/(gamma-1)*V*dpdTh;
+end
