@@ -1,10 +1,17 @@
 function [dQdTh] = aROHR(p,V, Ca, gamma, iselect)
-pi = p(:, iselect);
-Cai = Ca(:, iselect);
-Vi = V;
+dpdTh = gradient(p, 20/720000);
+dVdTh = gradient(V, 20/720000);
 
-dpdTh = gradient(pi, Cai);
-dVdTh = gradient(Vi, Cai);
+dQdTh = zeros(1, length(gamma));
 
-dQdTh = gamma/(gamma-1).*pi.*dVdTh + 1/(gamma-1).*Vi.*dpdTh;
+for i = 1:length(gamma)
+    dQdTh(i) = gamma(i)/(gamma(i)-1).*p(i).*dVdTh(i) + 1/(gamma(i)-1).*V(i).*dpdTh(i);
+end
+figure;
+plot(dpdTh)
+title("p")
+
+figure;
+plot(dVdTh)
+title("V")
 end
