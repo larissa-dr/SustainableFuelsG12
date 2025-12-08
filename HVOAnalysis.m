@@ -155,7 +155,10 @@ Vm_smooth = smoothdata(Vm, 'movmean', window);
 % Recompute gamma using smoothed signals
 gammad = GammaHVO(p_smooth, Vm_smooth, mtot);
 figure;
-plot(gammad)
+plot(Ca(:,1),gammad)
+xlabel("Crank angle [°]")
+ylabel("Gamma (\gamma) [-]","Interpreter","tex")
+title("Dynamic gamma (\gamma) over a cycle","Interpreter","tex")
 
 % aROHR using smoothed inputs
 dQdThd = aROHR(p_smooth, Vm_smooth, Ca, gammad, iselect);
@@ -163,7 +166,7 @@ Qd     = cumtrapz(dQdThd);
 Q50d   = 0.5 * sum(Qd);
 i50d   = find(cumsum(Qd) >= Q50d, 1);
 
-gamma = 1.42 * ones(1, length(gammad));
+gamma = 1.39 * ones(1, length(gammad));
 dQdTh = aROHR(p_smooth, Vm_smooth, Ca, gamma, iselect);
 Q     = cumtrapz(dQdTh);
 Q50   = 0.5 * sum(Q);
@@ -176,8 +179,8 @@ plot(Ca(:, 1), Q);
 %plot(Ca(:, 1), dQdThd);
 %plot(Ca(:, 1), dQdTh);
 %legend("Qd", "Qs", "dQd", "dQs")
-legend("Qd", "Qs")
-xlabel("Crank angle")
-ylabel("Q")
+legend("Qd", "Qs (γ = 1.39 [-])")
+xlabel("Crank angle [°]")
+ylabel("Q [J/s]")
 title("Cumulative heat release over one cycle")
 grid on;
