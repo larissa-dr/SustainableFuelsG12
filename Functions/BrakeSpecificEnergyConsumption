@@ -1,0 +1,10 @@
+%% Brake Specific Energy Consumption
+function BSEC = BrakeSpecificEnergyConsumption(eta_b)
+
+BSEC = 3.6 ./ eta_b;  % MJ/kWh
+
+figure;
+plot(BSEC);
+xlabel('Cycle index');
+ylabel('BSEC (MJ/kWh)');
+title('Brake Specific Energy Consumption');
