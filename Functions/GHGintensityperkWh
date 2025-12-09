@@ -1,0 +1,13 @@
+%% GHG intensity per kWh
+function GHG_kWh = GHGintensityperkWh(eta_b)
+
+% Example CI for Yellow grease to HEFA
+CI = 1.0291e-5;   % t CO2e per MJ
+
+GHG_kWh = CI .* (3.6 ./ eta_b) * 1e6; % gCO2e/kWh
+
+figure;
+plot(GHG_kWh);
+xlabel('Cycle index');
+ylabel('GHG (gCO2e/kWh)');
+title('Well-to-Wheel GHG Intensity');
