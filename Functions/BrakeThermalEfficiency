@@ -1,0 +1,16 @@
+%% Brake Thermal Efficiency
+function eta_b = BrakeThermalEfficiency(mass_flow, Power)
+
+% Fuel mass flow is given as mdot_fuel in grams per second
+mdot_fuel = mass_flow * 1e-3;   % measured fuel mass flow (kg/s) convert g/s to kg/s
+
+% Use LHV for diesel B7 unless changed by fuel type
+LHV = 43e6; % J/kg (B7 taken from Project Handbook modify per fuel later)
+
+eta_b = Power ./ (mdot_fuel .* LHV);
+
+figure;
+plot(eta_b);
+xlabel('Cycle index');
+ylabel('Brake Thermal Efficiency');
+title('BTE');
