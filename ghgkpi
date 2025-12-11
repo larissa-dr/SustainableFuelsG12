@@ -1,0 +1,144 @@
+%% ============================
+%   Single-Point KPI Extraction
+% =============================
+
+%% Init
+clearvars; clc; close all;
+addpath("Functions","Nasa");
+
+%% Units
+mm = 1e-3; 
+dm = 0.1;
+bara = 1e5;
+
+%% Load NASA data
+global Runiv
+Runiv = 8.314;
+[SpS, El] = myload('Nasa\NasaThermalDatabase.mat', {'Diesel','O2','N2','CO2','H2O'});
+
+%% Engine Geometry
+Cyl.Bore = 104*mm;
+Cyl.Stroke = 85*mm;
+Cyl.CompressionRatio = 21.5;
+Cyl.ConRod = 136.5*mm;
+Cyl.TDCangle = 0;
+
+CaIVO = -355;
+CaIVC = -135;
+CaEVO = 149;
+CaEVC = -344;
+CaSOI = -3.2;
+
+%% Load fdaq data
+FullName = fullfile('Data','20251125_0000001_imep_1.5_injection_18_fdaq.txt');
+dataIn = table2array(readtable(FullName));
+[Nrows,~] = size(dataIn);      
+NdatapointsperCycle = 720/0.2;
+Ncycles = Nrows / NdatapointsperCycle;
+Ca = reshape(dataIn(:,1),[],Ncycles);
+p_raw = reshape(dataIn(:,2),[],Ncycles)*bara;
+
+%% Average the raw data
+p_avg = AveragePressure(p_raw);
+
+%% Load sdaq  data
+sDaq = fullfile('Data','20251125_0000001_imep_1.5_injection_18_sdaq.txt');
+IntakeData = table2array(readtable(sDaq));
+p_intake = mean(IntakeData(:,4)) * bara;
+
+%% --- INPUT ---
+file = "Data/HVO_ManualData.xlsx";   % change to Diesel_B7..., GTL..., etc.
+target_injection = 18;          % degrees BTDC
+target_IMEP = 1.5;              % bar 
+
+% GREET carbon intensity (example for HVO)
+CI = 0.000035513;   % t CO2e / MJ (Soybean GHG-100 from GREET)
+
+% Lower Heating Value (per fuel)
+LHV = 44e6;       % J/kg for HVO from source
+
+
+%% --- LOAD THE TABLE ---
+data = readtable(file);
+
+%% --- Extract columns ---
+Injection = data.("InjectionTiming");
+IMEP      = str2double(string(data.IMEP));
+
+massFlow  = str2double(string(data.massFlow));   % g/s
+CO        = str2double(string(data.CO));
+CO2       = str2double(string(data.CO2));
+HC        = str2double(string(data.HC));
+O2        = str2double(string(data.O2));
+NOx       = str2double(string(data.Nox));
+Lambda    = str2double(string(data.Lambda));
+FSN       = str2double(string(data.("MeanValue_FSN_")));
+
+%% --- FIND THE ROW FOR THE OPERATING POINT ---
+idx = find(Injection == target_injection & IMEP == target_IMEP);
+
+if isempty(idx)
+    error("Operating point not found in dataset.");
+end
+
+fprintf("\nSelected row = %d\n", idx);
+
+%% --- Extract the single row ---
+mFuel_gps = massFlow(idx);
+CO_ppm    = CO(idx);
+CO2_pct   = CO2(idx);
+HC_ppm    = HC(idx);
+O2_pct    = O2(idx);
+NOx_ppm   = NOx(idx);
+lambda    = Lambda(idx);
+fsn       = FSN(idx);
+
+%% --- Compute KPIs ---
+% ---- 1. Brake Thermal Efficiency (requires power) ----
+EngineRPM = 1500;
+
+% pV Calculation
+[p_avg_pegged, p_shift, idxIVC] = PegPressure(Ca, p_avg, p_intake, CaIVC);
+iselect = 1;                                    % Plots 1 cycle 
+
+V = CylinderVolume(Ca(:,iselect), Cyl);  % m^3
+p_cycle = p_avg_pegged(:, iselect);   
+V_cycle = V;
+
+% Indicated Power
+[IP, Wcycle] = CalcIndicatedPower(p_cycle, V, EngineRPM, Ncycles);
+
+
+fprintf("Work per cycle: %.3f J\n", Wcycle);
+fprintf("Indicated Power: %.3f W\n", IP);
+
+eta_b = IP / ( (mFuel_gps/1000) * LHV );
+
+% ---- 2. BSFC (g/kWh) ----
+BSFC = (mFuel_gps * 3600) / (IP/1000);
+
+% ---- 3. BSEC (MJ/kWh) ----
+BSEC = 3.6 / eta_b;
+
+% ---- 4. WTW GHG Intensity (gCO2e/kWh) ----
+GHG_kWh = CI * BSEC * 1e6;
+
+%% --- DISPLAY RESULTS ---
+fprintf("\nKPIs at Injection = %.1f°, IMEP = %.1f \n", ...
+        target_injection, target_IMEP);
+
+fprintf("Fuel mass flow    = %.4f g/s\n", mFuel_gps);
+fprintf("Power             = %.2f W\n", IP);
+fprintf("Brake efficiency  = %.4f \n", eta_b);
+fprintf("BSFC              = %.2f g/kWh\n", BSFC);
+fprintf("BSEC              = %.2f MJ/kWh\n", BSEC);
+fprintf("GHG intensity     = %.2f gCO2e/kWh\n", GHG_kWh);
+
+fprintf("\nEmissions raw values:\n");
+fprintf("CO   = %.2f %%\n", CO_ppm);
+fprintf("CO2  = %.2f %%\n", CO2_pct);
+fprintf("HC   = %.2f ppm\n", HC_ppm);
+fprintf("O2   = %.2f %%\n", O2_pct);
+fprintf("NOx  = %.2f ppm\n", NOx_ppm);
+fprintf("λ    = %.2f \n", lambda);
+fprintf("FSN  = %.2f mg/m^3\n", fsn);
