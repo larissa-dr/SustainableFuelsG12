@@ -95,3 +95,39 @@ yyaxis right
 plot(Ca, p_avg); ylabel('Pressure');
 xline(0,'k--','TDC');
 grid on;
+
+
+%% Filtering pressure (already averaged and pegged)
+
+% Savitzky–Golay filter parameters
+dCa        = Ca(2,1) - Ca(1,1);   % crank-angle step
+polyOrder = 2;
+window_deg = 4;               % smooth over 2 crank-angle degrees
+
+Nwin = round(window_deg / dCa);   % convert to number of points
+if mod(Nwin,2) == 0               % SG window length must be odd
+    Nwin = Nwin + 1;
+end
+
+% Filtered mean pressure
+
+p_avg_peg_filt = sgolayfilt(p_avg_pegged, polyOrder, Nwin);
+
+
+% pV-diagrams(with noise reduction and averaging)
+V = CylinderVolume(Ca(:,iselect),Cyl);
+f4 = figure(4);
+set(f4,'Position',[ 200 400 600 800]);           
+subplot(2,1,1)
+plot(V/dm^3,p_avg_peg_filt/bara);
+xlabel('V [dm^3]');ylabel('p [bar]');             
+xlim([0 0.8]);ylim([0.5 60]);                    
+set(gca,'XTick',[0:0.1:0.8],'XGrid','on','YGrid','on');      
+title({'pV (filtered)'})
+subplot(2,1,2)
+loglog(V/dm^3,p_avg_peg_filt/bara);
+xlabel('V [dm^3]');ylabel('p [bar]');              
+xlim([0.02 0.8]);ylim([0 60]);                      
+set(gca,'XTick',[0.02 0.05 0.1 0.2 0.5 0.8],...
+    'YTick',[0.5 1 2 5 10 20 50],'XGrid','on','YGrid','on');       
+title({'pV (filtered)   LOG scale'})
