@@ -1,4 +1,4 @@
-function [IP, Wcycle] = CalcIndicatedPower(p_cycle, V, EngineRPM, Ncycles)
+function [IP, Wcycle] = CalcIndicatedPower(p_cycle, V, EngineRPM, N_cyl)
 
 % inputs:
 %   cylinder pressure array [Pa]
@@ -20,6 +20,7 @@ cycles_per_sec = (EngineRPM/60) / 2;
 IP_per_cyl = Wcycle * cycles_per_sec;
 
 % total indicated power
-IP = IP_per_cyl * Ncycles;
+IP = IP_per_cyl * N_cyl;
 
 end
+
