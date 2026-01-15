@@ -112,7 +112,7 @@ mdot_fuel_gps = mean(mdot(:)); % in g/s
 %% Values for functions
 EngineRPM = 1500; 
 
-AFR = 43; %included from Boscos code
+AFR = 18; %included from Boscos code
 
 mtotdot = Massflow(mdot_fuel_gps, AFR)/1000; % in kg/s
 cycles_per_sec = EngineRPM / 60 / 2;  
@@ -183,4 +183,16 @@ legend("Qd", "Qs (γ = 1.39 [-])")
 xlabel("Crank angle [°]")
 ylabel("Q [J/s]")
 title("Cumulative heat release over one cycle")
+grid on;
+
+figure;
+plot(Ca(:, 1), dQdThd); hold on;
+plot(Ca(:, 1), dQdTh);
+%plot(Ca(:, 1), dQdThd);
+%plot(Ca(:, 1), dQdTh);
+%legend("Qd", "Qs", "dQd", "dQs")
+legend("dQdTh_d", "dQdTh_s")
+xlabel("Crank angle [Ca]")
+ylabel("[J/Ca]")
+title("Rate heat release over one cycle")
 grid on;
