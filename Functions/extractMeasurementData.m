@@ -1,3 +1,7 @@
+% Extracts data from files to a for MATLAB readable struct array
+%----------------------------------------------------------------------
+
+
 function measurements = extractMeasurementData(filename)
 
 T = readtable(filename);

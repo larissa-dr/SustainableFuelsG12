@@ -1,15 +1,17 @@
+% Calculates indicated power over cycle
+
+% INPUTS: 
+%   Cylinder pressure array [Pa]
+%   Cylinder volume array [m^3]
+%   Engine speed [rev/min]
+%   Number of cylinders
+
+% OUTPUT:
+%   Work done per cylinder per cycle [J]
+%   Total indicated power [W]
+%----------------------------------------------------------------------
+
 function [IP, Wcycle] = CalcIndicatedPower(p_cycle, V, EngineRPM, N_cyl)
-
-% inputs:
-%   cylinder pressure array [Pa]
-%   cylinder volume array [m^3]
-%  engine speed [rev/min]
-%   number of cylinders
-%
-% Outputs:
-%  work done per cylinder per cycle [J]
-%  total indicated power [W]
-
 % work per cycle by integrating p dV
 Wcycle = trapz(V, p_cycle);   % J = Pa*m^3
 

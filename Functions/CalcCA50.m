@@ -1,3 +1,12 @@
+% CalcHRR: Calculates apparent heat release rate and cumulative heat release
+
+% INPUTS:
+%   Cumulative heat released
+
+% OUTPUTS:
+%   Crank angle struct array
+%----------------------------------------------------------------------
+
 function CA50 = CalcCA50(Qcum, Ca)
     Qtot = Qcum(end);                %  total heat released in the cycle
     idx = find(Qcum >= 0.5*Qtot, 1); % first index where cumulative heat is more than 50% of total

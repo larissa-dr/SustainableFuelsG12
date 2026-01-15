@@ -1,3 +1,14 @@
+% Caculates aROHR
+
+% INPUTS:
+%   pressure measurements (array)
+%   volume measurements (array)
+%   gamma (can be static or dynamic)
+
+% OUTPUTS:
+%   apparent rate of heat release
+%----------------------------------------------------------------------
+
 function [dQdTh] = aROHR(p,V, Ca, gamma, iselect)
 dpdTh = gradient(p, 20/720000);
 dVdTh = gradient(V, 20/720000);

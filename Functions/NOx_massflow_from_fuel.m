@@ -1,6 +1,14 @@
-function mNOx = NOx_massflow_from_fuel(NOx_ppm, mdot_fuel_gps)
-% calculates NOx mass flow from fuel mass flow and NOx concentration
+% Calculates NOx mass flow from fuel mass flow and NOx concentration
 
+% INPUTS: 
+%   NOX ppm
+%   Fuel massflow 
+
+% OUTPUT: 
+%   mNOx
+%----------------------------------------------------------------------
+
+function mNOx = NOx_massflow_from_fuel(NOx_ppm, mdot_fuel_gps)
 %  parameters
 AFR     = 14.5;       % air to fuel ratio
 MW_exh  = 29e-3;      % molecular weight of exhaust 

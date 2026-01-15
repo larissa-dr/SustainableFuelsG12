@@ -1,3 +1,12 @@
+% Caculates bsNOx
+
+% INPUTS:
+%   mNOx
+
+% OUTPUTS:
+%   Power
+%----------------------------------------------------------------------
+
 function [bsNOx] = bsNOx(mNOx, Power)
 % bsNOx  : brake-specific NOx emissions [kg/(W*s)]
 % mNOx   : NOx mass flow [kg/s] (output from NOx_massflow_from_fuel)

@@ -1,3 +1,14 @@
+% Calculates mCO2
+
+% INPUTS: 
+%   AFR (air to fuel ratio), 
+%   Mdotfuel (mass flow of fuel)
+%   Volumetric percentage of CO2
+
+% OUTPUT:
+%   mCO2
+%----------------------------------------------------------------------
+    
 function mCO2 = CO2_massflow_from_fuel(CO2_volpct, mdot_fuel_gps)
 
 AFR = 14.5;

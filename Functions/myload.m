@@ -1,3 +1,6 @@
+% This function opens and indexes sps and eq for the NASA polynomials
+%----------------------------------------------------------------------
+
 function [SpS,El] = myload(filename,species)
 load(filename);
 isp = myfind({Sp.Name},species);

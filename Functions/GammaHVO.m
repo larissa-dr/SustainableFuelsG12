@@ -1,3 +1,15 @@
+% Calculates/plots the dynamic gamma of a fuel, taking into account ratios
+% of substances in the mixture, and temperature
+
+% INPUTS: 
+%   p (pressure over a chosen cycle)
+%   V (volume over crank angle)
+%   mtot (Total mass)
+
+% OUTPUT: 
+%   dynamic gamma of mixture over chosen engine cycle
+%----------------------------------------------------------------------
+
 function gamma_mix = GammaHVO(p, V, mtot)
 %% Compositions
 

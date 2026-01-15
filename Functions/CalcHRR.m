@@ -1,10 +1,15 @@
-function [HRR, Qcum] = CalcHRR(p, V, gamma)
-% CalcHRR: Calculates apparent heat release rate and cumulative heat release
-% 
+% Calculates apparent heat release rate and cumulative heat release
+
+% INPUTS
 %   gamma - ratio of specific heats (it needs to be dynamic)
 %   HRR  - apparent heat release rate [J/deg]
 %   Qcum - cumulative heat release [J]
 
+% OUTPUTS
+%   apparent heat release and cumulative heat release
+%----------------------------------------------------------------------
+
+function [HRR, Qcum] = CalcHRR(p, V, gamma)
 % Ensure column vectors
 p = p(:);
 V = V(:);

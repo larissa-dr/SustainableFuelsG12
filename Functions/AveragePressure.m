@@ -1,4 +1,3 @@
-function p_avg = AveragePressure(p_raw)
 % Averages cycle pressure over all cycles
 
 % INPUT:
@@ -6,6 +5,12 @@ function p_avg = AveragePressure(p_raw)
 
 % OUTPUT:
 %   p_avg : column vector (N_CA×1)
+
+%----------------------------------------------------------------------
+
+function p_avg = AveragePressure(p_raw)
+% 
+
 
 p_avg = mean(p_raw, 2);
 
