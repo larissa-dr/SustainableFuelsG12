@@ -122,10 +122,46 @@ mtot = mtotdot / cycles_per_sec;
 Vm = V; % convert to m^3; was already in m3 i think
 
 %Smoothen data
-window = 11; % take an uneven value, then it is half-1 points before, 1 center and half-1 points after
+%window = 11; % take an uneven value, then it is half-1 points before, 1 center and half-1 points after
 
-p_smooth  = smoothdata(p_avg, 'movmean', window);  % smoothens the p_avg with movmean = replaces value with average of window around it
-Vm_smooth = smoothdata(Vm, 'movmean', window);
+%p_smooth  = smoothdata(p_avg, 'movmean', window);  % smoothens the p_avg with movmean = replaces value with average of window around it
+%Vm_smooth = smoothdata(Vm, 'movmean', window);
+
+%% Filtering and prepare smoothed volume (structured)
+% 1 Replace outliers
+p_clean = filloutliers(p_avg,'linear','movmedian',11);
+
+%% Filtering and prepare smoothed volume 
+% 1 Replace outliers
+p_clean = filloutliers(p_avg,'linear','movmedian',11);
+% 2 Butterworth zero-phase
+fs = 3600 * (EngineRPM/60/2); 
+fc = 1000; 
+Wn = fc/(fs/2);
+[b,a] = butter(4, Wn, 'low');
+p_butter = filtfilt(b,a, p_clean);
+% 3 Savitzky-Golay
+p_sg = sgolayfilt(p_clean, 3, 21);
+% 4 Wavelet denoise
+p_wav = wdenoise(p_clean, 6, 'Wavelet','sym4','DenoisingMethod','SURE');
+% 5 Smooth volume 
+Vm_med    = medfilt1(Vm, 5);
+Vm_smooth = movmean(Vm_med, 21);
+% 6 Choose main smoothing for subsequent analysis
+p_smooth = p_butter;   
+% 7 Recompute gamma and aROHR for chosen smoothing
+gammad = GammaHVO(p_smooth, Vm_smooth, mtot);
+dQdTh = aROHR(p_smooth, Vm_smooth, Ca, gammad, iselect);
+% 8 compute for other methods for comparison
+gammad_b = GammaHVO(p_butter, Vm_smooth, mtot);
+dQdTh_b  = aROHR(p_butter, Vm_smooth, Ca, gammad_b, iselect);
+
+gammad_sg = GammaHVO(p_sg, Vm_smooth, mtot);
+dQdTh_sg  = aROHR(p_sg, Vm_smooth, Ca, gammad_sg, iselect);
+
+gammad_w = GammaHVO(p_wav, Vm_smooth, mtot);
+dQdTh_w  = aROHR(p_wav, Vm_smooth, Ca, gammad_w, iselect);
+
 
 % Recompute gamma using smoothed signals
 gammad = GammaHVO(p_smooth, Vm_smooth, mtot);
@@ -135,20 +171,37 @@ xlabel("Crank angle [°]")
 ylabel("Gamma (\gamma) [-]","Interpreter","tex")
 title("Dynamic gamma (\gamma) over a cycle","Interpreter","tex")
 
-% Plot Cumulative heat release: dynamic compared to static gamma
+% aROHR using smoothed inputs
+dQdThd = aROHR(p_smooth, Vm_smooth, Ca, gammad, iselect);
+Qd     = cumtrapz(dQdThd);
+Q50d   = 0.5 * sum(Qd);
+i50d   = find(cumsum(Qd) >= Q50d, 1);
+
+gamma = 1.39 * ones(1, length(gammad));
+dQdTh = aROHR(p_smooth, Vm_smooth, Ca, gamma, iselect);
+Q     = cumtrapz(dQdTh);
+Q50   = 0.5 * sum(Q);
+i50   = find(cumsum(Q) >= Q50, 1);
+
+% Plot
 figure;
 plot(Ca(:, 1), Qd); hold on;
 plot(Ca(:, 1), Q);
+%plot(Ca(:, 1), dQdThd);
+%plot(Ca(:, 1), dQdTh);
+%legend("Qd", "Qs", "dQd", "dQs")
 legend("Qd", "Qs (γ = 1.39 [-])")
 xlabel("Crank angle [°]")
-ylabel("[J/s]")
+ylabel("Q [J/s]")
 title("Cumulative heat release over one cycle")
 grid on;
 
-% Plot Rate heat relase: dynamic compared to static gamma
 figure;
 plot(Ca(:, 1), dQdThd); hold on;
 plot(Ca(:, 1), dQdTh);
+%plot(Ca(:, 1), dQdThd);
+%plot(Ca(:, 1), dQdTh);
+%legend("Qd", "Qs", "dQd", "dQs")
 legend("dQdTh_d", "dQdTh_s")
 xlabel("Crank angle [Ca]")
 ylabel("[J/Ca]")
