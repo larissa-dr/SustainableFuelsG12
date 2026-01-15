@@ -117,33 +117,8 @@ AFR = 18; %included from Boscos code
 mtotdot = Massflow(mdot_fuel_gps, AFR)/1000; % in kg/s
 cycles_per_sec = EngineRPM / 60 / 2;  
 mtot = mtotdot / cycles_per_sec; 
-%% IMEP
-%IMEP = IMEP(p_avg, V);
-%figure;
-%hold on;
-%plot(IMEP)
-%hold off;
-%% bsfc
-%bsfc = bsfc(mtot, Torque);
-%figure;
-%hold on;
-%plot(bsfc)
-%hold off;
-%% bsCO2
-%mCO2 = CO2_massflow_from_fuel(CO2_volpct, mdot_fuel_gps);
-%bsCO2 = bsCO2(mCO2, Power);
-%figure;
-%hold on;
-%plot(bsCO2)
-%hold off;
-%% bsNOx
-%mNOx = NOx_massflow_from_fuel(NOx_ppm, mdot_fuel_gps);
-%bsNOx = bsNOx(mNOx, Power);
-%figure;
-%hold on;
-%plot(mNOx)
-%hold off;
-%% aROHR to Ca50
+
+%% Dynamic Gamma code with aROHR: for analysis of modeling system mostly
 Vm = V; % convert to m^3; was already in m3 i think
 
 %Smoothen data
@@ -160,37 +135,20 @@ xlabel("Crank angle [°]")
 ylabel("Gamma (\gamma) [-]","Interpreter","tex")
 title("Dynamic gamma (\gamma) over a cycle","Interpreter","tex")
 
-% aROHR using smoothed inputs
-dQdThd = aROHR(p_smooth, Vm_smooth, Ca, gammad, iselect);
-Qd     = cumtrapz(dQdThd);
-Q50d   = 0.5 * sum(Qd);
-i50d   = find(cumsum(Qd) >= Q50d, 1);
-
-gamma = 1.39 * ones(1, length(gammad));
-dQdTh = aROHR(p_smooth, Vm_smooth, Ca, gamma, iselect);
-Q     = cumtrapz(dQdTh);
-Q50   = 0.5 * sum(Q);
-i50   = find(cumsum(Q) >= Q50, 1);
-
-% Plot
+% Plot Cumulative heat release: dynamic compared to static gamma
 figure;
 plot(Ca(:, 1), Qd); hold on;
 plot(Ca(:, 1), Q);
-%plot(Ca(:, 1), dQdThd);
-%plot(Ca(:, 1), dQdTh);
-%legend("Qd", "Qs", "dQd", "dQs")
 legend("Qd", "Qs (γ = 1.39 [-])")
 xlabel("Crank angle [°]")
-ylabel("Q [J/s]")
+ylabel("[J/s]")
 title("Cumulative heat release over one cycle")
 grid on;
 
+% Plot Rate heat relase: dynamic compared to static gamma
 figure;
 plot(Ca(:, 1), dQdThd); hold on;
 plot(Ca(:, 1), dQdTh);
-%plot(Ca(:, 1), dQdThd);
-%plot(Ca(:, 1), dQdTh);
-%legend("Qd", "Qs", "dQd", "dQs")
 legend("dQdTh_d", "dQdTh_s")
 xlabel("Crank angle [Ca]")
 ylabel("[J/Ca]")
