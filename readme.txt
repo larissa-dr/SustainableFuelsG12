@@ -26,7 +26,9 @@ Please run the scripts in the following order:
 2.  **`HVOAnalysis.m`**
     * Purpose: Performs detailed analysis on the HVO fuel data using the high frequency signal data. It performs pegging, filtering, and Gamma calculations.
 3.  **`CompareAllFuels.m`**
-    * Purpose: Generates comparison plots for emissions and performance across all tested fuels and injection timings. Also calculates 	       KPIS of every fuel
+    * Purpose: Generates comparison plots for emissions and performance across all tested fuels and injection timings. Also calculates KPIS of every fuel
+4.  **`EngineEfficiencyHeatMaps.m`**
+     Purpose: Make the heatmaps for the engine efficiency
 
 ## File Structure
 
