@@ -192,3 +192,5 @@ for k = 1:numel(KPI_names)
         grid on
     end
 end
+
+CompareFuelsAll
