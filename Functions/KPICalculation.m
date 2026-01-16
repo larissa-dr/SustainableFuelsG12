@@ -1,4 +1,4 @@
-function CompareFuelsAll
+function KPICalculation
 % Compare HVO and B7 for several emissions at different Injection Timings
 % Uses the manual data Excel files in the Data folder (NOT THE ProcessingManualData.m).
 

@@ -193,4 +193,4 @@ for k = 1:numel(KPI_names)
     end
 end
 
-CompareFuelsAll
+KPICalculation
