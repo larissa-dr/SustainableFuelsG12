@@ -177,7 +177,7 @@ Qd     = cumtrapz(dQdThd);
 Q50d   = 0.5 * sum(Qd);
 i50d   = find(cumsum(Qd) >= Q50d, 1);
 
-gamma = 1.39 * ones(1, length(gammad));
+gamma = 1.34 * ones(1, length(gammad));
 dQdTh = aROHR(p_smooth, Vm_smooth, Ca, gamma, iselect);
 Q     = cumtrapz(dQdTh);
 Q50   = 0.5 * sum(Q);
@@ -190,7 +190,7 @@ plot(Ca(:, 1), Q);
 %plot(Ca(:, 1), dQdThd);
 %plot(Ca(:, 1), dQdTh);
 %legend("Qd", "Qs", "dQd", "dQs")
-legend("Qd", "Qs (γ = 1.39 [-])")
+legend("Qd", "Qs (γ = 1.34 [-])")
 xlabel("Crank angle [°]")
 ylabel("Q [J/s]")
 title("Cumulative heat release over one cycle")
@@ -202,8 +202,8 @@ plot(Ca(:, 1), dQdTh);
 %plot(Ca(:, 1), dQdThd);
 %plot(Ca(:, 1), dQdTh);
 %legend("Qd", "Qs", "dQd", "dQs")
-legend("dQdTh_d", "dQdTh_s")
+legend("dQdTh_d", "dQdTh_s (γ = 1.34 [-])")
 xlabel("Crank angle [Ca]")
 ylabel("[J/Ca]")
-title("Rate heat release over one cycle")
+title("Filtered Rate of Heat Release over one cycle")
 grid on;
