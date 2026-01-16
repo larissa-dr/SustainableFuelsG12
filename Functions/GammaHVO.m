@@ -45,9 +45,6 @@ Rmix_avg = (Rmix_in + Rmix_out)/2; %in kg
 
 %% Calculations
 T = Temperature(p, V, mtot, Rmix_avg);
-figure;
-plot(T)
-title("T")
 
 Cp = zeros(1, length(T));
 Cv = zeros(1, length(T));
